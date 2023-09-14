@@ -4,6 +4,8 @@ import datetime
 from os import getenv
 import src.detector as detector
 import src.recognition as recognition
+import src.emotion_detector as emotion_det
+import src.age_gender_detector as age_gender_detection
 import json
 
 CAMERA_INDEX = getenv('CAMERA_INDEX')
@@ -15,7 +17,7 @@ def acked(err, msg):
         print("Message produced: %s" % (str(msg)))
 
 if __name__ == "__main__":
-    img = cv2.imread('./imgs/two-happy-multicultural-programmers-smiling-camera-office_824701-9087.jpg')
+    img = cv2.imread('./imgs/longname.jpg')
     previous_detected_faces = []
     cv2.imshow('Camera', img)
 
@@ -32,6 +34,14 @@ if __name__ == "__main__":
 
         face_encoding = recognition.get_face_encodings_from_image(image=face, face_locations=face_locations)
 
+        emotion_detector = emotion_det.EmotionDetector()
+        detected = emotion_detector.call(face)
+
+        print(detected)
+
+        age, gender = age_gender_detection.find_age_and_gender(face)
+
+        print(f'Age: {age}, gender: {gender}')
 
         if len(previous_detected_faces) == 0:
             previous_detected_faces.append({
