@@ -1,2 +1,4 @@
+.vscode
 inspiration/
 venv/
+src/__pycache__/

@@ -1,7 +1,8 @@
 import cv2
 
+
 def crop_region_of_interest(
-        image, 
+        image,
         x=0,
         y=0,
         w=150,
