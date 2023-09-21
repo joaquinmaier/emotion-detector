@@ -9,7 +9,7 @@ class EmotionDetector(pr.Processor):
         self.classify = MiniXceptionFER()
         self.draw = pr.DrawBoxes2D(self.classify.class_names)
 
-    def call(self, image):
+    def call(self, image) -> pr.DrawBoxes2D:
         boxes2D = self.detect(image)['boxes2D']
         cropped_images = self.crop(image, boxes2D)
         for cropped_image, box2D in zip(cropped_images, boxes2D):
