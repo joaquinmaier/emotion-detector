@@ -1,0 +1,2 @@
+- get rid of detector, recognition & editor, replacing them with a face_detector.py
+- implement get_all_emotions in emotion_classifier.py
