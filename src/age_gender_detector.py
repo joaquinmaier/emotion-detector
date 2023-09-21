@@ -1,4 +1,3 @@
-# coom
 import cv2
 
 MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
@@ -17,7 +16,12 @@ AGE_RANGES_LIST = ['(0-2)', '(4-6)', '(8-12)', '(15-20)',
 
 def find_age_and_gender(frame) -> tuple:
     blob = cv2.dnn.blobFromImage(
-        frame, 1.0, (227, 227), MODEL_MEAN_VALUES, swapRB=False)
+        frame,
+        1.0,
+        (227, 227),
+        MODEL_MEAN_VALUES,
+        swapRB=False
+    )
 
     gender_net = cv2.dnn.readNet(GENDER_MODEL, GENDER_PROTO)
     gender_net.setInput(blob)
