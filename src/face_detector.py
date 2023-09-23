@@ -9,5 +9,5 @@ class FaceDetector(pr.Processor):
 
     def __call__(self, img) -> tuple():
         boxes2D = self.face_detector(img)['boxes2D']
-        cropped_imgs = pr.CropBoxes2D(img, boxes2D)
+        cropped_imgs = pr.CropBoxes2D()(img, boxes2D)
         return cropped_imgs

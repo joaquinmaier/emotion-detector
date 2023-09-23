@@ -1,6 +1,6 @@
 from paz.applications import MiniXceptionFER
 import paz.processors as pr
-from src.detection_result import DetectionResult
+from src.data_classes.detection_result import DetectionResult
 import numpy as np
 
 
