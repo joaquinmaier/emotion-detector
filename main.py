@@ -48,13 +48,19 @@ def main():
 
         for index, face in enumerate(detected_faces):
             rgb_face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
-            predictions: dict = DeepFace.analyze(rgb_face)[0]
+            predictions: dict = {}
+            try:
+                predictions = DeepFace.analyze(rgb_face)[0]
+
+            except:
+                print('\x1b[1;31mDeepFace detected no faces.\x1b[0m')
+                break
 
             print(f'\n-- Results [{index}] --')
             print(f'Age\t->\t{predictions["age"]}')
-            print(f'Gender\t->\t{predictions["dominant_gender"]} (confidence: {predictions["gender"][ predictions["dominant_gender"] ]})')
-            print(f'Emotion\t->\t{predictions["dominant_emotion"]} (confidence: {predictions["emotion"][ predictions["dominant_emotion"] ]})')
-            print(f'Race\t->\t{predictions["dominant_race"]} (confidence: {predictions["race"][ predictions["dominant_race"] ]})')
+            print(f'Gender\t->\t{predictions["dominant_gender"]} (confidence: {round(predictions["gender"][ predictions["dominant_gender"] ], 3)}%)')
+            print(f'Emotion\t->\t{predictions["dominant_emotion"]} (confidence: {round(predictions["emotion"][ predictions["dominant_emotion"] ], 3)}%)')
+            print(f'Race\t->\t{predictions["dominant_race"]} (confidence: {round(predictions["race"][ predictions["dominant_race"] ], 3)}%)')
 
             print('\n\n++++++++++')
             print(f'Top {EXTRA_INFO_TOP_QUANTITY} emotions by highest confidence:')
@@ -66,7 +72,7 @@ def main():
             )[0:EXTRA_INFO_TOP_QUANTITY]
 
             for i in range(len(emotions_sorted_by_confidence)):
-                print(f'({i})\t{emotions_sorted_by_confidence[i][0]} (confidence: {emotions_sorted_by_confidence[i][1]})')
+                print(f'({i})\t{emotions_sorted_by_confidence[i][0]} (confidence: {round(emotions_sorted_by_confidence[i][1], 3)}%)')
 
             print(f'\nTop {EXTRA_INFO_TOP_QUANTITY} races by highest confidence:')
 
@@ -77,7 +83,7 @@ def main():
             )[0:EXTRA_INFO_TOP_QUANTITY]
 
             for i in range(len(races_sorted_by_confidence)):
-                print(f'({i})\t{races_sorted_by_confidence[i][0]} (confidence: {races_sorted_by_confidence[i][1]})')
+                print(f'({i})\t{races_sorted_by_confidence[i][0]} (confidence: {round(races_sorted_by_confidence[i][1], 3)}%)')
 
             cv2.imshow(f'Face detected: {index}', face)
 
