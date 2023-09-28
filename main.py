@@ -51,6 +51,7 @@ def main():
             age = age_classifier.max_age_range(face)
             gender = gender_classifier.find_gender(face)
 
+            print(f'\n-- Results [{index}] --')
             print(f'Age: {age}, gender: {gender}')
             print(f'-- Predicted Emotion (Model\'s choice) --\n\tEmotion: {predicted_emotions[0].result} - Confidence: {predicted_emotions[0].confidence}')
 
