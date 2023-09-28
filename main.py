@@ -47,11 +47,17 @@ def main():
         cv2.imshow('Original Image', img)
 
         for index, face in enumerate(detected_faces):
-            emotion = emotion_classifier.get_max_emotion(face)
+            predicted_emotions = emotion_classifier.get_top_emotions(face)
             age = age_classifier.max_age_range(face)
             gender = gender_classifier.find_gender(face)
 
-            print(f'Age: {age}, gender: {gender}, Emotion: {emotion}')
+            print(f'Age: {age}, gender: {gender}')
+            print(f'-- Predicted Emotion (Model\'s choice) --\n\tEmotion: {predicted_emotions[0].result} - Confidence: {predicted_emotions[0].confidence}')
+
+            print('\n-- Other possible emotions --\n')
+            for i in range(1, len(predicted_emotions)):
+                print(f'({i})\tEmotion: {predicted_emotions[i].result} - Confidence: {predicted_emotions[i].confidence}')
+
             cv2.imshow(f'Face detected: {index}', face)
 
         while True:

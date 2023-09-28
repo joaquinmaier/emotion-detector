@@ -3,6 +3,8 @@ import paz.processors as pr
 from src.data_classes.detection_result import DetectionResult
 import numpy as np
 
+FER_EMOTION_CLASS_NAMES: list[str]  = ['angry', 'disgust', 'fear', 'happy',
+                                        'sad', 'surprise', 'neutral']
 
 class EmotionClassifier(pr.Processor):
     def __init__(self):
@@ -16,19 +18,11 @@ class EmotionClassifier(pr.Processor):
         )[self.classifier.class_names.index(max_emotion)]
         return DetectionResult(max_emotion, confidence)
 
-    def get_top_emotions(self, image, amount=3):  # -> tuple(DetectionResult):
-        raise NotImplementedError("Not implemented")
+    def get_top_emotions(self, image, quantity=3) ->list[DetectionResult]:
+        prediction_scores = self.classifier(image)['scores'].reshape(-1)
 
-    '''
-      scores = sorted([(score, emotion) for emotion, score in zip(
-                self.classifier.class_names, prediction['scores'].ravel())], reverse=True)
+        emotions_with_scores_dict = { FER_EMOTION_CLASS_NAMES[i]: prediction_scores[i] for i in range(len(FER_EMOTION_CLASS_NAMES)) }
+        emotions_with_scores = sorted(emotions_with_scores_dict.items(), key=lambda x: x[1], reverse=True)[0:quantity]
 
-            print(klas)
-            print(score)
-            print(scores)
+        return [ DetectionResult(emotion, confidence) for emotion, confidence in emotions_with_scores ]
 
-            results.append({'face': cropped_image,
-                            'emotion': klas,
-                            'scores': scores})
-          
-    '''

@@ -7,7 +7,7 @@ class FaceDetector(pr.Processor):
         super(FaceDetector, self).__init__()
         self.face_detector = HaarCascadeFrontalFace(draw=False)
 
-    def __call__(self, img) -> tuple():
+    def __call__(self, img) -> tuple:
         boxes2D = self.face_detector(img)['boxes2D']
         cropped_imgs = pr.CropBoxes2D()(img, boxes2D)
         return cropped_imgs
