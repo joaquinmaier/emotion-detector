@@ -1,22 +1,25 @@
 import os
 import sys
 import cv2
+from deepface import DeepFace
 from src.face_detector import FaceDetector
-from src.classifiers.age_classifier import AgeClassifier
-from src.classifiers.gender_classifier import GenderClassifier
-from src.classifiers.emotion_classifier import EmotionClassifier
 
 IMGS_PATH = os.path.join(os.path.dirname(__file__), 'imgs')
 TEST_IMGS_PATH = os.path.join(IMGS_PATH, 'tests')
 CURRENT_IMGS_PATH = os.path.join(IMGS_PATH, 'current')
 ESC_KEYCODE = 27
 ENTER_KEYCODE = 13
-
+EXTRA_INFO_TOP_QUANTITY = 3
 
 def main():
+    cmd_args = sys.argv[1:] if len(sys.argv) > 1 else None
+
     images_path = CURRENT_IMGS_PATH
-    if len(sys.argv) > 1 and sys.argv[1] == "--test":
-        images_path = TEST_IMGS_PATH
+    if cmd_args is not None:
+        for arg in cmd_args:
+            match arg:
+                case "--test":
+                    images_path = TEST_IMGS_PATH
 
     images = os.listdir(images_path)
     if len(images) == 0:
@@ -25,9 +28,6 @@ def main():
 
     print("Initializing...")
 
-    age_classifier = AgeClassifier()
-    gender_classifier = GenderClassifier()
-    emotion_classifier = EmotionClassifier()
     face_detector = FaceDetector()
     interrupted = False
 
@@ -47,16 +47,37 @@ def main():
         cv2.imshow('Original Image', img)
 
         for index, face in enumerate(detected_faces):
-            predicted_emotions = emotion_classifier.get_top_emotions(face)
-            age = age_classifier.max_age_range(face)
-            gender = gender_classifier.find_gender(face)
+            rgb_face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
+            predictions: dict = DeepFace.analyze(rgb_face)[0]
 
-            print(f'Age: {age}, gender: {gender}')
-            print(f'-- Predicted Emotion (Model\'s choice) --\n\tEmotion: {predicted_emotions[0].result} - Confidence: {predicted_emotions[0].confidence}')
+            print(f'\n-- Results [{index}] --')
+            print(f'Age\t->\t{predictions["age"]}')
+            print(f'Gender\t->\t{predictions["dominant_gender"]} (confidence: {predictions["gender"][ predictions["dominant_gender"] ]})')
+            print(f'Emotion\t->\t{predictions["dominant_emotion"]} (confidence: {predictions["emotion"][ predictions["dominant_emotion"] ]})')
+            print(f'Race\t->\t{predictions["dominant_race"]} (confidence: {predictions["race"][ predictions["dominant_race"] ]})')
 
-            print('\n-- Other possible emotions --\n')
-            for i in range(1, len(predicted_emotions)):
-                print(f'({i})\tEmotion: {predicted_emotions[i].result} - Confidence: {predicted_emotions[i].confidence}')
+            print('\n\n++++++++++')
+            print(f'Top {EXTRA_INFO_TOP_QUANTITY} emotions by highest confidence:')
+
+            emotions_sorted_by_confidence = sorted(
+                predictions["emotion"].items(),
+                key=lambda x: x[1],
+                reverse=True
+            )[0:EXTRA_INFO_TOP_QUANTITY]
+
+            for i in range(len(emotions_sorted_by_confidence)):
+                print(f'({i})\t{emotions_sorted_by_confidence[i][0]} (confidence: {emotions_sorted_by_confidence[i][1]})')
+
+            print(f'\nTop {EXTRA_INFO_TOP_QUANTITY} races by highest confidence:')
+
+            races_sorted_by_confidence = sorted(
+                predictions["race"].items(),
+                key=lambda x: x[1],
+                reverse=True
+            )[0:EXTRA_INFO_TOP_QUANTITY]
+
+            for i in range(len(races_sorted_by_confidence)):
+                print(f'({i})\t{races_sorted_by_confidence[i][0]} (confidence: {races_sorted_by_confidence[i][1]})')
 
             cv2.imshow(f'Face detected: {index}', face)
 
@@ -74,3 +95,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
